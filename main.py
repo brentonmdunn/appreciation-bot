@@ -27,8 +27,8 @@ FAV_BIBLE_VERSE_COL = 18
 FAV_MEMORY_COL = 19
 QQC_COL = 20
 
-BOT_SPAM_CHANNEL_ID = 801996449373356094
-# BOT_SPAM_CHANNEL_ID = 1359287733335363724
+# BOT_SPAM_CHANNEL_ID = 801996449373356094
+BOT_SPAM_CHANNEL_ID = 1359287733335363724
 
 
 def run() -> None:
@@ -184,7 +184,10 @@ def run() -> None:
             }
 
         if len(responses) == 0:
-            await interaction.response.send_message(f"No senior named {name} found.")
+            await interaction.response.send_message(
+                f"""No senior named "{name}" found."""
+            )
+            return
 
         embed = discord.Embed(
             title=f"Profile for {name}",
