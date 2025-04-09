@@ -98,6 +98,36 @@ def run() -> None:
         #     await log_channel.send(f"{user.name} unreacted {payload.emoji} to message '{discord.utils.escape_mentions(message.content)}' in #{channel.name}")
         # return
 
+    @bot.tree.command(name="help", description="Available commands for ApppreciatinBot")
+    async def help_bot(interaction: discord.Interaction) -> None:
+        embed = discord.Embed(title="AppreciationBot Commands", color=discord.Color.blue())
+
+        embed.add_field(
+            name="`/rsvps`",
+            value="Lists everyone who has RSVP'd",
+            inline=False
+        )
+
+        embed.add_field(
+            name="`/rsvps-seniors`", 
+            value="Lists seniors who have RSVP'd",
+            inline=False
+        )
+
+        embed.add_field(
+            name="`/food-allergies`", 
+            value="Lists people who have food allergies",
+            inline=False
+        )
+
+        embed.add_field(
+            name="`/profile <name>`", 
+            value="Lists answers to the questions that the senior put on RSVP form",
+            inline=False
+        )
+
+        await interaction.response.send_message(embed=embed)
+
     @bot.tree.command(
         name="profile",
         description="Lists answers to the questions that the senior put on RSVP form",
@@ -119,8 +149,8 @@ def run() -> None:
                 continue
 
             if (
-                name not in row[FNAME_COL].lower()
-                and name not in row[LNAME_COL].lower()
+                name.lower() not in row[FNAME_COL].lower()
+                and name.lower() not in row[LNAME_COL].lower()
                 or "senior" not in row[IS_SENIOR_COL]
             ):
                 continue
