@@ -27,7 +27,8 @@ FAV_BIBLE_VERSE_COL = 18
 FAV_MEMORY_COL = 19
 QQC_COL = 20
 
-BOT_SPAM_CHANNEL_ID = 1359287733335363724
+BOT_SPAM_CHANNEL_ID = 801996449373356094
+# BOT_SPAM_CHANNEL_ID = 1359287733335363724
 
 
 def run() -> None:
@@ -192,7 +193,7 @@ def run() -> None:
 
         for person, attr in responses.items():
             embed.add_field(
-                name=f"Name: {person}",
+                name=f"{person}",
                 value="\n".join(
                     f"• {question}: {resp}" for question, resp in attr.items()
                 ),
