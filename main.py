@@ -111,6 +111,42 @@ def run() -> None:
     #         await member.add_roles(role)
     #         await interaction.response.send_message("You have been given the 🐟 **fish** role!", ephemeral=True)
 
+    @bot.tree.command(name="rsvps-seniors", description="Lists seniors who have RSVP'd")
+    async def rsvps_seniors(interaction: discord.Interaction) -> None:
+        response = requests.get(CSV_URL, timeout=100)
+
+        if response.status_code != 200:
+            await interaction.response.send_message("Error occurred trying to get CSV.")
+
+        csv_data = response.content.decode("utf-8")
+        csv_reader = csv.reader(csv_data.splitlines(), delimiter=",")
+
+        responses = defaultdict(list)
+        is_first = True
+        for row in csv_reader:
+            if is_first:
+                is_first = False
+                continue
+
+            if "senior" in row[IS_SENIOR_COL]:
+                responses["seniors"].append(
+                    f"{row[FNAME_COL].capitalize()} {row[LNAME_COL].capitalize()}"
+                )
+
+        embed = discord.Embed(
+            title="RSVPs Seniors",
+            color=discord.Color.blue(),
+        )
+
+        embed.add_field(
+            name=f"Total: {len(responses['seniors'])}",
+            value="\n".join(f"• {x}" for x in sorted(responses["seniors"])),
+            inline=False,
+        )
+
+        await interaction.response.send_message(embed=embed)
+
+
     @bot.tree.command(name="rsvps", description="Lists everyone who has RSVP'd")
     async def rsvps(interaction: discord.Interaction) -> None:
         response = requests.get(CSV_URL, timeout=100)
