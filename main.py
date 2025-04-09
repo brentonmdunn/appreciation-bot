@@ -27,6 +27,8 @@ FAV_BIBLE_VERSE_COL = 18
 FAV_MEMORY_COL = 19
 QQC_COL = 20
 
+BOT_SPAM_CHANNEL_ID = 1359287733335363724
+
 
 def run() -> None:
     """Main method for bot."""
@@ -100,30 +102,35 @@ def run() -> None:
 
     @bot.tree.command(name="help", description="Available commands for ApppreciatinBot")
     async def help_bot(interaction: discord.Interaction) -> None:
-        embed = discord.Embed(title="AppreciationBot Commands", color=discord.Color.blue())
+        if interaction.channel_id != BOT_SPAM_CHANNEL_ID:
+            await interaction.response.send_message(
+                f"Bot commands can only be run in <#{BOT_SPAM_CHANNEL_ID}>",
+                ephemeral=True,
+            )
+            return
 
-        embed.add_field(
-            name="`/rsvps`",
-            value="Lists everyone who has RSVP'd",
-            inline=False
+        embed = discord.Embed(
+            title="AppreciationBot Commands", color=discord.Color.blue()
         )
 
         embed.add_field(
-            name="`/rsvps-seniors`", 
-            value="Lists seniors who have RSVP'd",
-            inline=False
+            name="`/rsvps`", value="Lists everyone who has RSVP'd", inline=False
         )
 
         embed.add_field(
-            name="`/food-allergies`", 
+            name="`/rsvps-seniors`", value="Lists seniors who have RSVP'd", inline=False
+        )
+
+        embed.add_field(
+            name="`/food-allergies`",
             value="Lists people who have food allergies",
-            inline=False
+            inline=False,
         )
 
         embed.add_field(
-            name="`/profile <name>`", 
+            name="`/profile <name>`",
             value="Lists answers to the questions that the senior put on RSVP form",
-            inline=False
+            inline=False,
         )
 
         await interaction.response.send_message(embed=embed)
@@ -133,6 +140,13 @@ def run() -> None:
         description="Lists answers to the questions that the senior put on RSVP form",
     )
     async def profile(interaction: discord.Interaction, name: str) -> None:
+        if interaction.channel_id != BOT_SPAM_CHANNEL_ID:
+            await interaction.response.send_message(
+                f"Bot commands can only be run in <#{BOT_SPAM_CHANNEL_ID}>",
+                ephemeral=True,
+            )
+            return
+
         response = requests.get(CSV_URL, timeout=100)
 
         if response.status_code != 200:
@@ -190,6 +204,13 @@ def run() -> None:
         name="food-allergies", description="Lists people who have food allergies"
     )
     async def food_allergies(interaction: discord.Interaction) -> None:
+        if interaction.channel_id != BOT_SPAM_CHANNEL_ID:
+            await interaction.response.send_message(
+                f"Bot commands can only be run in <#{BOT_SPAM_CHANNEL_ID}>",
+                ephemeral=True,
+            )
+            return
+
         response = requests.get(CSV_URL, timeout=100)
 
         if response.status_code != 200:
@@ -228,6 +249,13 @@ def run() -> None:
 
     @bot.tree.command(name="rsvps-seniors", description="Lists seniors who have RSVP'd")
     async def rsvps_seniors(interaction: discord.Interaction) -> None:
+        if interaction.channel_id != BOT_SPAM_CHANNEL_ID:
+            await interaction.response.send_message(
+                f"Bot commands can only be run in <#{BOT_SPAM_CHANNEL_ID}>",
+                ephemeral=True,
+            )
+            return
+
         response = requests.get(CSV_URL, timeout=100)
 
         if response.status_code != 200:
@@ -263,6 +291,13 @@ def run() -> None:
 
     @bot.tree.command(name="rsvps", description="Lists everyone who has RSVP'd")
     async def rsvps(interaction: discord.Interaction) -> None:
+        if interaction.channel_id != BOT_SPAM_CHANNEL_ID:
+            await interaction.response.send_message(
+                f"Bot commands can only be run in <#{BOT_SPAM_CHANNEL_ID}>",
+                ephemeral=True,
+            )
+            return
+
         response = requests.get(CSV_URL, timeout=100)
 
         if response.status_code != 200:
