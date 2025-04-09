@@ -101,7 +101,7 @@ def run() -> None:
         #     await log_channel.send(f"{user.name} unreacted {payload.emoji} to message '{discord.utils.escape_mentions(message.content)}' in #{channel.name}")
         # return
 
-    @bot.tree.command(name="help", description="Available commands for ApppreciatinBot")
+    @bot.tree.command(name="help", description="Available commands for ApppreciationBot")
     async def help_bot(interaction: discord.Interaction) -> None:
         if interaction.channel_id != BOT_SPAM_CHANNEL_ID:
             await interaction.response.send_message(
