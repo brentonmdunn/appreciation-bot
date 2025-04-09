@@ -17,6 +17,15 @@ LNAME_COL = 3
 FOOD_ALLERGY_YN_COL = 4
 FOOD_ALLERGY_LIST_COL = 5
 IS_SENIOR_COL = 6
+FAV_COLOR_COL = 12
+FAV_SNACK_COL = 13
+FAV_ANIMAL_COL = 14
+FAV_HOBBY_COL = 15
+FAV_ARTIST_COL = 16
+FAV_MOVIE_COL = 17
+FAV_BIBLE_VERSE_COL = 18
+FAV_MEMORY_COL = 19
+QQC_COL = 20
 
 
 def run() -> None:
@@ -89,27 +98,63 @@ def run() -> None:
         #     await log_channel.send(f"{user.name} unreacted {payload.emoji} to message '{discord.utils.escape_mentions(message.content)}' in #{channel.name}")
         # return
 
-    # @bot.tree.command(name="fish", description="test")
-    # async def fish(interaction: discord.Interaction) -> None:
+    @bot.tree.command(
+        name="profile",
+        description="Lists answers to the questions that the senior put on RSVP form",
+    )
+    async def profile(interaction: discord.Interaction, name: str) -> None:
+        response = requests.get(CSV_URL, timeout=100)
 
-    #     guild = interaction.guild
-    #     member = interaction.user
+        if response.status_code != 200:
+            await interaction.response.send_message("Error occurred trying to get CSV.")
 
-    #     if guild is None:
-    #         await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
-    #         return
+        csv_data = response.content.decode("utf-8")
+        csv_reader = csv.reader(csv_data.splitlines(), delimiter=",")
 
-    #     role = discord.utils.get(guild.roles, name="fish")
+        responses = {}
+        is_first = True
+        for row in csv_reader:
+            if is_first:
+                is_first = False
+                continue
 
-    #     if not role:
-    #         await interaction.response.send_message("Role 'fish' not found.", ephemeral=True)
-    #         return
+            if (
+                name not in row[FNAME_COL].lower()
+                and name not in row[LNAME_COL].lower()
+                or "senior" not in row[IS_SENIOR_COL]
+            ):
+                continue
 
-    #     if role in member.roles:
-    #         await interaction.response.send_message("You already have the fish role!", ephemeral=True)
-    #     else:
-    #         await member.add_roles(role)
-    #         await interaction.response.send_message("You have been given the 🐟 **fish** role!", ephemeral=True)
+            responses[
+                f"{row[FNAME_COL].capitalize()} {row[LNAME_COL].capitalize()}"
+            ] = {
+                "favorite color": row[FAV_COLOR_COL],
+                "favorite food/snack": row[FAV_SNACK_COL],
+                "favorite animal": row[FAV_ANIMAL_COL],
+                "favorite artist": row[FAV_ARTIST_COL],
+                "favorite movie/tv show": row[FAV_MOVIE_COL],
+                "favorite bible verse": row[FAV_BIBLE_VERSE_COL],
+                "favorite memory/thing about AACF": row[FAV_MEMORY_COL],
+                "questions/comments/concerns": row[QQC_COL],
+            }
+
+        if len(responses) == 0:
+            await interaction.response.send_message(f"No senior named {name} found.")
+
+        embed = discord.Embed(
+            title=f"Profile for {name}",
+            color=discord.Color.blue(),
+        )
+
+        for person, attr in responses.items():
+            embed.add_field(
+                name=f"Name: {person}",
+                value="\n".join(
+                    f"• {question}: {resp}" for question, resp in attr.items()
+                ),
+                inline=False,
+            )
+        await interaction.response.send_message(embed=embed)
 
     @bot.tree.command(
         name="food-allergies", description="Lists people who have food allergies"
@@ -230,6 +275,28 @@ def run() -> None:
         )
 
         await interaction.response.send_message(embed=embed)
+
+    # @bot.tree.command(name="fish", description="test")
+    # async def fish(interaction: discord.Interaction) -> None:
+
+    #     guild = interaction.guild
+    #     member = interaction.user
+
+    #     if guild is None:
+    #         await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
+    #         return
+
+    #     role = discord.utils.get(guild.roles, name="fish")
+
+    #     if not role:
+    #         await interaction.response.send_message("Role 'fish' not found.", ephemeral=True)
+    #         return
+
+    #     if role in member.roles:
+    #         await interaction.response.send_message("You already have the fish role!", ephemeral=True)
+    #     else:
+    #         await member.add_roles(role)
+    #         await interaction.response.send_message("You have been given the 🐟 **fish** role!", ephemeral=True)
 
     bot.run(TOKEN)
 
