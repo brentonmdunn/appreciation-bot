@@ -171,7 +171,7 @@ def run() -> None:
                 continue
 
             responses[
-                f"{row[FNAME_COL].capitalize()} {row[LNAME_COL].capitalize()}"
+                f"{row[FNAME_COL].capitalize().strip()} {row[LNAME_COL].capitalize().strip()}"
             ] = {
                 "favorite color": row[FAV_COLOR_COL],
                 "favorite food/snack": row[FAV_SNACK_COL],
@@ -234,7 +234,7 @@ def run() -> None:
                 continue
 
             responses[
-                f"{row[FNAME_COL].capitalize()} {row[LNAME_COL].capitalize()}"
+                f"{row[FNAME_COL].capitalize().strip()} {row[LNAME_COL].capitalize().strip()}"
             ] = row[FOOD_ALLERGY_LIST_COL]
 
         embed = discord.Embed(
@@ -277,7 +277,7 @@ def run() -> None:
 
             if "senior" in row[IS_SENIOR_COL]:
                 responses["seniors"].append(
-                    f"{row[FNAME_COL].capitalize()} {row[LNAME_COL].capitalize()}"
+                    f"{row[FNAME_COL].capitalize().strip()} {row[LNAME_COL].capitalize().strip()}"
                 )
 
         embed = discord.Embed(
@@ -319,11 +319,11 @@ def run() -> None:
 
             if "senior" in row[IS_SENIOR_COL]:
                 responses["seniors"].append(
-                    f"{row[FNAME_COL].capitalize()} {row[LNAME_COL].capitalize()}"
+                    f"{row[FNAME_COL].capitalize().strip()} {row[LNAME_COL].capitalize().strip()}"
                 )
             else:
                 responses["nonseniors"].append(
-                    f"{row[FNAME_COL].capitalize()} {row[LNAME_COL].capitalize()}"
+                    f"{row[FNAME_COL].capitalize().strip()} {row[LNAME_COL].capitalize().strip()}"
                 )
 
         embed = discord.Embed(
