@@ -31,6 +31,16 @@ QQC_COL = 20
 BOT_SPAM_CHANNEL_ID = 1359287733335363724
 
 
+roles_dict = {
+    "🎵": "worship", 
+    "🎁": "gifts", 
+    "🎀": "decorations", 
+    "🎲": "games", 
+    "🧑‍🍳": "food", 
+    "🙏": "prayer", 
+    "📷": "photos"
+}
+
 def run() -> None:
     """Main method for bot."""
 
@@ -57,6 +67,9 @@ def run() -> None:
 
     @bot.event
     async def on_raw_reaction_add(payload):
+        if payload.message_id != 1362160618542469302:
+            return 
+        
         guild = bot.get_guild(payload.guild_id)
         if guild is None:
             return  # DM or unknown guild
@@ -65,18 +78,44 @@ def run() -> None:
         if not isinstance(channel, discord.TextChannel):
             return  # Ensure it's a text channel
 
-        message = await channel.fetch_message(payload.message_id)  # Fetch the message
 
-        user = guild.get_member(payload.user_id)
+        member = payload.member
+        if member is None:
+            try:
+                member = await guild.fetch_member(payload.user_id)
+            except discord.NotFound:
+                print("Member not found.")
+                return
 
         # Check if the reaction is from a bot
-        if user and user.bot:
-            print(f"Ignoring bot reaction from {user.name}")
+        if member.bot:
+            print(f"Ignoring bot reaction from {member.name}")
             return
 
+
+
+        if str(payload.emoji) in roles_dict:
+            role_name = roles_dict[str(payload.emoji)]
+            role = discord.utils.get(guild.roles, name=role_name)
+
+            if role is None:
+                print(f"Role '{role_name}' not found.")
+                return
+
+            if role in member.roles:
+                print("User already has the role.")
+            else:
+                await member.add_roles(role)
+                print(f"Gave role '{role_name}' to {member.name}")
+
+
+
+
+
     @bot.event
-    async def on_raw_reaction_remove(payload: discord.RawReactionActionEvent):
-        """Logs when a reaction is removed."""
+    async def on_raw_reaction_remove(payload):
+        if payload.message_id != 1362160618542469302:
+            return 
         guild = bot.get_guild(payload.guild_id)
         if guild is None:
             return  # DM or unknown guild
@@ -85,21 +124,35 @@ def run() -> None:
         if not isinstance(channel, discord.TextChannel):
             return  # Ensure it's a text channel
 
-        message = await channel.fetch_message(payload.message_id)  # Fetch the message
-        user = guild.get_member(payload.user_id)
+        member = payload.member
+        if member is None:
+            try:
+                member = await guild.fetch_member(payload.user_id)
+            except discord.NotFound:
+                print("Member not found.")
+                return
 
-        if user and user.bot:
-            print(f"Ignoring bot reaction removal from {user.name}")
+        # Skip bots
+        if member.bot:
             return
 
-        if not user:
-            return
 
-        # Sample
-        # log_channel = bot.get_channel(SERVING_BOT_SPAM_CHANNEL_ID)
-        # if log_channel:
-        #     await log_channel.send(f"{user.name} unreacted {payload.emoji} to message '{discord.utils.escape_mentions(message.content)}' in #{channel.name}")
-        # return
+
+        emoji = str(payload.emoji)
+        if emoji in roles_dict:
+            role_name = roles_dict[emoji]
+            role = discord.utils.get(guild.roles, name=role_name)
+
+            if role is None:
+                print(f"Role '{role_name}' not found.")
+                return
+
+            if role in member.roles:
+                await member.remove_roles(role)
+                print(f"Removed role '{role_name}' from {member.name}")
+            else:
+                print(f"{member.name} didn't have role '{role_name}'")
+
 
     @bot.tree.command(name="help", description="Available commands for ApppreciationBot")
     async def help_bot(interaction: discord.Interaction) -> None:
@@ -366,6 +419,33 @@ def run() -> None:
     #     else:
     #         await member.add_roles(role)
     #         await interaction.response.send_message("You have been given the 🐟 **fish** role!", ephemeral=True)
+
+    # @bot.tree.command(name="react-roles", description="Lists everyone who has RSVP'd")
+    # async def react_roles(interaction: discord.Interaction) -> None:
+    
+
+    #     embed = discord.Embed(
+    #         title="React for roles",
+    #         color=discord.Color.blue(),
+    #         description="""
+    #             🎵 Worship
+    #             🎁 Gifts
+    #             🎀 Decorations
+    #             🎲 Games
+    #             🧑‍🍳 Food
+    #             🙏 Prayer
+    #             📷 Photos
+    #         """
+    #     )
+
+    #     await interaction.response.send_message(embed=embed)
+
+    #     sent_message = await interaction.original_response()
+
+    #     reactions = ["🎵", "🎁", "🎀", "🎲", "🧑‍🍳", "🙏", "📷"]
+    #     for reaction in reactions:
+    #         await sent_message.add_reaction(reaction)
+
 
     bot.run(TOKEN)
 
