@@ -32,14 +32,15 @@ BOT_SPAM_CHANNEL_ID = 1359287733335363724
 
 
 roles_dict = {
-    "🎵": "worship", 
-    "🎁": "gifts", 
-    "🎀": "decorations", 
-    "🎲": "games", 
-    "🧑‍🍳": "food", 
-    "🙏": "prayer", 
-    "📷": "photos"
+    "🎵": "worship",
+    "🎁": "gifts",
+    "🎀": "decorations",
+    "🎲": "games",
+    "🧑‍🍳": "food",
+    "🙏": "prayer",
+    "📷": "photos",
 }
+
 
 def run() -> None:
     """Main method for bot."""
@@ -67,9 +68,9 @@ def run() -> None:
 
     @bot.event
     async def on_raw_reaction_add(payload):
-        if payload.message_id != 1362160618542469302:
-            return 
-        
+        if payload.message_id != 1362239660654334143:
+            return
+
         guild = bot.get_guild(payload.guild_id)
         if guild is None:
             return  # DM or unknown guild
@@ -77,7 +78,6 @@ def run() -> None:
         channel = bot.get_channel(payload.channel_id)
         if not isinstance(channel, discord.TextChannel):
             return  # Ensure it's a text channel
-
 
         member = payload.member
         if member is None:
@@ -91,8 +91,6 @@ def run() -> None:
         if member.bot:
             print(f"Ignoring bot reaction from {member.name}")
             return
-
-
 
         if str(payload.emoji) in roles_dict:
             role_name = roles_dict[str(payload.emoji)]
@@ -108,14 +106,10 @@ def run() -> None:
                 await member.add_roles(role)
                 print(f"Gave role '{role_name}' to {member.name}")
 
-
-
-
-
     @bot.event
     async def on_raw_reaction_remove(payload):
-        if payload.message_id != 1362160618542469302:
-            return 
+        if payload.message_id != 1362239660654334143:
+            return
         guild = bot.get_guild(payload.guild_id)
         if guild is None:
             return  # DM or unknown guild
@@ -136,8 +130,6 @@ def run() -> None:
         if member.bot:
             return
 
-
-
         emoji = str(payload.emoji)
         if emoji in roles_dict:
             role_name = roles_dict[emoji]
@@ -153,8 +145,9 @@ def run() -> None:
             else:
                 print(f"{member.name} didn't have role '{role_name}'")
 
-
-    @bot.tree.command(name="help", description="Available commands for ApppreciationBot")
+    @bot.tree.command(
+        name="help", description="Available commands for ApppreciationBot"
+    )
     async def help_bot(interaction: discord.Interaction) -> None:
         if interaction.channel_id != BOT_SPAM_CHANNEL_ID:
             await interaction.response.send_message(
@@ -420,32 +413,29 @@ def run() -> None:
     #         await member.add_roles(role)
     #         await interaction.response.send_message("You have been given the 🐟 **fish** role!", ephemeral=True)
 
-    # @bot.tree.command(name="react-roles", description="Lists everyone who has RSVP'd")
-    # async def react_roles(interaction: discord.Interaction) -> None:
-    
+    @bot.tree.command(name="react-roles", description="Lists everyone who has RSVP'd")
+    async def react_roles(interaction: discord.Interaction) -> None:
+        embed = discord.Embed(
+            title="React for roles",
+            color=discord.Color.blue(),
+            description=(
+                "🎵 Worship\n"
+                "🎁 Gifts\n"
+                "🎀 Decorations\n"
+                "🎲 Games\n"
+                "🧑‍🍳 Food\n"
+                "🙏 Prayer\n"
+                "📷 Photos"
+            ),
+        )
 
-    #     embed = discord.Embed(
-    #         title="React for roles",
-    #         color=discord.Color.blue(),
-    #         description="""
-    #             🎵 Worship
-    #             🎁 Gifts
-    #             🎀 Decorations
-    #             🎲 Games
-    #             🧑‍🍳 Food
-    #             🙏 Prayer
-    #             📷 Photos
-    #         """
-    #     )
+        await interaction.response.send_message(embed=embed)
 
-    #     await interaction.response.send_message(embed=embed)
+        sent_message = await interaction.original_response()
 
-    #     sent_message = await interaction.original_response()
-
-    #     reactions = ["🎵", "🎁", "🎀", "🎲", "🧑‍🍳", "🙏", "📷"]
-    #     for reaction in reactions:
-    #         await sent_message.add_reaction(reaction)
-
+        reactions = ["🎵", "🎁", "🎀", "🎲", "🧑‍🍳", "🙏", "📷"]
+        for reaction in reactions:
+            await sent_message.add_reaction(reaction)
 
     bot.run(TOKEN)
 
