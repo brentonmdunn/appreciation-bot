@@ -413,29 +413,57 @@ def run() -> None:
     #         await member.add_roles(role)
     #         await interaction.response.send_message("You have been given the 🐟 **fish** role!", ephemeral=True)
 
-    @bot.tree.command(name="react-roles", description="Lists everyone who has RSVP'd")
-    async def react_roles(interaction: discord.Interaction) -> None:
-        embed = discord.Embed(
-            title="React for roles",
-            color=discord.Color.blue(),
-            description=(
-                "🎵 Worship\n"
-                "🎁 Gifts\n"
-                "🎀 Decorations\n"
-                "🎲 Games\n"
-                "🧑‍🍳 Food\n"
-                "🙏 Prayer\n"
-                "📷 Photos"
-            ),
-        )
+    # @bot.tree.command(name="react-roles", description="Lists everyone who has RSVP'd")
+    # async def react_roles(interaction: discord.Interaction) -> None:
+    #     embed = discord.Embed(
+    #         title="React for roles",
+    #         color=discord.Color.blue(),
+    #         description=(
+    #             "🎵 Worship\n"
+    #             "🎁 Gifts\n"
+    #             "🎀 Decorations\n"
+    #             "🎲 Games\n"
+    #             "🧑‍🍳 Food\n"
+    #             "🙏 Prayer\n"
+    #             "📷 Photos"
+    #         ),
+    #     )
 
-        await interaction.response.send_message(embed=embed)
+    #     await interaction.response.send_message(embed=embed)
 
-        sent_message = await interaction.original_response()
+    #     sent_message = await interaction.original_response()
 
-        reactions = ["🎵", "🎁", "🎀", "🎲", "🧑‍🍳", "🙏", "📷"]
-        for reaction in reactions:
-            await sent_message.add_reaction(reaction)
+    #     reactions = ["🎵", "🎁", "🎀", "🎲", "🧑‍🍳", "🙏", "📷"]
+    #     for reaction in reactions:
+    #         await sent_message.add_reaction(reaction)
+
+
+    @bot.tree.command(name="ask-videos", description="Pings everyone who has not turned in videos")
+    async def ask_videos(interaction: discord.Interaction) -> None:
+        # if interaction.channel_id != BOT_SPAM_CHANNEL_ID:
+        #     await interaction.response.send_message(
+        #         f"Bot commands can only be run in <#{BOT_SPAM_CHANNEL_ID}>",
+        #         ephemeral=True,
+        #     )
+        #     return
+
+        CATEGORY_ID = 1377345707530256424
+        for guild in bot.guilds:
+            category = discord.utils.get(guild.categories, id=CATEGORY_ID)
+            if category:
+                for channel in category.text_channels:
+                    try:
+                        message = (
+                            f"hello @everyone if you are receiving this message it means that your group has not uploaded your video for {channel.name} to the [Google Drive folder](https://drive.google.com/drive/folders/1NK8fi5IoGBaKMmSLlLqKMxBUWo7BmdaJ?usp=drive_link). Please let me know the status of your video by end of today.\n"
+                            "- If your video is __currently not filmed__, please let me know what day you intend to film and when you can deliver the video by\n"
+                            "- If your video is __filmed but not fully edited__, please let me know when you can deliver the video by\n\n"
+                            "I am trying to put the video together Friday evening (~4pm), so if you can get it before then it would be extremely helpful\n-Brenton"
+                        )
+                        await channel.send(message)
+                        print(f"Sent message to {channel.name}")
+                    except Exception as e:
+                        print(f"Failed to send message to {channel.name}: {e}")
+        await interaction.response.send_message("Success")
 
     bot.run(TOKEN)
 
